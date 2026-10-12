@@ -1,0 +1,29 @@
+name: Fabriquer installateur Windows
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  installer:
+    runs-on: windows-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+          architecture: x64
+      - name: Installer Inno Setup
+        shell: pwsh
+        run: choco install innosetup --yes --no-progress
+      - name: Construire et tester
+        shell: pwsh
+        working-directory: Cedric_Elec_Atelier_PC
+        run: ./packaging/build-windows.ps1
+      - name: Conserver l'installateur
+        uses: actions/upload-artifact@v4
+        with:
+          name: Cedric-Elec-Atelier-Installateur-Windows
+          path: Cedric_Elec_Atelier_PC/dist-installateur/*
+          retention-days: 7
+          if-no-files-found: error
